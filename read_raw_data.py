@@ -4,6 +4,7 @@
 @Date  :2021/1/2119:33
 @Desc  :这里主要做的是将数据读入，然后将大概流程跑通
         涉及到select range bin
+        将信号处理流程处理成一个函数，方便多组数据输入
 """
 
 import numpy as np
@@ -15,7 +16,8 @@ from signalDetection_v2.get_raw_data import radar_data_read, de, find_peak
 import glob, os
 
 
-def signalProcess(data_path, para_path='E:\\基于毫米波的运动监测\\device_data\\2021_2_27_8_55_32_para.txt'):
+def signalProcess(data_path, para_path='E:\\基于毫米波的运动监测\\device_data\\2021_2_27_8_55_32_para.txt', range_low=0.3,
+                  range_up=1.75):
     """
     # 毫米波雷达数据在get_raw_data.py中写入
     # 这里不涉及雷达的操作，只是读入先前写入的文件
@@ -85,8 +87,9 @@ def signalProcess(data_path, para_path='E:\\基于毫米波的运动监测\\devi
     S = (upper_frequency_kHz - lower_frequency_kHz) * 1000 / chirp_time_sec
     d = f * c / 2 / S
     d_resolution = adc_samplerate_hz / num_samples_per_chirp * c / 2 / S
+    d_max = c * adc_samplerate_hz / 2 / 2 / S
     print("d_resolution: ", d_resolution)
-
+    print("d_max:", d_max)
     """
     对每个chirp进行FFT
     """
@@ -132,7 +135,7 @@ def signalProcess(data_path, para_path='E:\\基于毫米波的运动监测\\devi
     plt.xlabel('Range(m)')
     plt.ylabel('Slow time(s)')
     plt.title('Range-slow time phase matrix')
-    plt.xlim(0.25,1.75)
+    plt.xlim(range_low, )
     plt.show()
 
     """
@@ -162,7 +165,7 @@ def signalProcess(data_path, para_path='E:\\基于毫米波的运动监测\\devi
     plt.colorbar()
     plt.xlabel('Range(m)')
     plt.ylabel('Slow time(s)')
-    plt.xlim(0.25, 1.75)
+    plt.xlim(range_low, )
     plt.title('Range-slow time phase matrix after phase unwrapping')
     plt.show()
 
@@ -190,7 +193,7 @@ def signalProcess(data_path, para_path='E:\\基于毫米波的运动监测\\devi
     plt.colorbar()
     plt.xlabel('Range(m)')
     plt.ylabel('Frequency(Hz)')
-    plt.xlim(0.3, 0.9)
+    plt.xlim(0.25, )
     plt.ylim(0, 2)
     plt.title('Range-Vibration map')
     plt.show()
@@ -239,8 +242,8 @@ def signalProcess(data_path, para_path='E:\\基于毫米波的运动监测\\devi
     plt.title("the chosen range {:.2f} m frequency spectrum".format(d_body[0]))
     plt.show()
     # 求出对应范围内的频率
-    heartbeat_frequency_1 = find_peak(f_doppler, radar_data_1_doppler_fft_amp_body, 1, 1.67)
-    respire_frequency_1 = find_peak(f_doppler, radar_data_1_doppler_fft_amp_body, 0.2, 0.4)
+    heartbeat_frequency_1 = find_peak(f_doppler, radar_data_1_doppler_fft_amp_body, 1, 2)
+    respire_frequency_1 = find_peak(f_doppler, radar_data_1_doppler_fft_amp_body, 0.1, 0.6)
 
     print("select range bin 方案一得到的呼吸频率：", round(respire_frequency_1, 2), "---", round(respire_frequency_1 * 60, 2))
     print("select range bin 方案一得到的心跳频率：", round(heartbeat_frequency_1, 2), "---", round(heartbeat_frequency_1 * 60, 2))
@@ -265,8 +268,8 @@ def signalProcess(data_path, para_path='E:\\基于毫米波的运动监测\\devi
     plt.title("the chosen range {:.2f} m frequency spectrum by method 2".format(d_body_doppler[0]))
     plt.show()
     # 求出频率
-    heartbeat_frequency_2 = find_peak(f_doppler, radar_data_1_doppler_fft_amp_body, 1, 1.67)
-    respire_frequency_2 = find_peak(f_doppler, radar_data_1_doppler_fft_amp_body, 0.2, 0.4)
+    heartbeat_frequency_2 = find_peak(f_doppler, radar_data_1_doppler_fft_amp_body, 1, 2)
+    respire_frequency_2 = find_peak(f_doppler, radar_data_1_doppler_fft_amp_body, 0.1, 0.6)
 
     print("select range bin 方案二得到的呼吸频率：", round(respire_frequency_2, 2), "---", round(respire_frequency_2 * 60, 2))
     print("select range bin 方案二得到的心跳频率：", round(heartbeat_frequency_2, 2), "---", round(heartbeat_frequency_2 * 60, 2))
@@ -317,8 +320,8 @@ def signalProcess(data_path, para_path='E:\\基于毫米波的运动监测\\devi
     plt.title("the chosen range {:.2f} m frequency spectrum after auto-correlate".format(d_body[0]))
     plt.show()
     # 求频率
-    heartbeat_frequency_3 = find_peak(f_corr, radar_data_1_fft_phase_body_corr_fft_amp, 1, 1.67)
-    respire_frequency_3 = find_peak(f_corr, radar_data_1_fft_phase_body_corr_fft_amp, 0.2, 0.4)
+    heartbeat_frequency_3 = find_peak(f_corr, radar_data_1_fft_phase_body_corr_fft_amp, 1, 2)
+    respire_frequency_3 = find_peak(f_corr, radar_data_1_fft_phase_body_corr_fft_amp, 0.1, 0.6)
 
     print("直接自相关得到的呼吸频率：", round(respire_frequency_3, 2), "---", round(respire_frequency_3 * 60, 2))
     print("直接自相关得到的心跳频率：", round(heartbeat_frequency_3, 2), "---", round(heartbeat_frequency_3 * 60, 2))

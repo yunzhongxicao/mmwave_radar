@@ -5,12 +5,13 @@
 @Desc  :
 '''
 import numpy as np
+import matplotlib.pyplot as plt
 a = np.array([1, 4, 3, -1, 6])
 print(a[2:])
 print(np.argmax(a))
 
-a = []
-if not a:
-    print(1)
-
+b = np.array([1, 4, 3, -1, 6])
+plt.plot(a,b)
+plt.xlim(1,)
+plt.show()
 

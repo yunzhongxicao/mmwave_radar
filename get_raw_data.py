@@ -273,7 +273,9 @@ def radar_data_write(num_samples_per_chirp=128,
                      if_gain_dB=33,
                      frame_end_delay_100ps=1500000,
                      shape_end_delay_100ps=1500000,
-                     num_frame=100):
+                     num_frame=100,
+                     data_path=None,
+                     para_path=None):
     chirp_time_in_gui = 133  # 设置完成其他参数后从GUI读取得到的
     devconf = mkDevConf(num_samples_per_chirp, num_chirps_per_frame, adc_samplerate_hz, frame_period_us,
                         lower_frequency_kHz, upper_frequency_kHz, bgt_tx_power,
@@ -320,7 +322,7 @@ def radar_data_write(num_samples_per_chirp=128,
     nowtime = str(year_int) + '_' + str(month_int) + '_' + str(day_int) + '_' + str(hour_int) + '_' + str(
         min_int) + '_' + str(second_int)
     # para_path = root_path + nowtime + '_para.txt'
-    para_path = root_path + 'para.txt'
+    # para_path = root_path + 'para.txt'
     para_file = open(para_path, 'w')
     para_file.write('num_samples_per_chirp=' + str(num_samples_per_chirp) + '\n')
     para_file.write('num_chirps_per_frame=' + str(num_chirps_per_frame) + '\n')
@@ -338,7 +340,7 @@ def radar_data_write(num_samples_per_chirp=128,
     para_file.write('chirp_time_in_gui=' + str(chirp_time_in_gui) + '\n')
 
     # data_path = root_path + nowtime + '_data.npy'
-    data_path = root_path + "350cm_zheng_1st.npy"
+    # data_path = root_path + "350cm_zheng_1st.npy"
     np.save(data_path, dem)
 
     print("Closing the device")
